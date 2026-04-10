@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { apiFetch } from '@/services/api'
 import { normalizeStatus } from './clients'
@@ -35,7 +35,7 @@ export const useDealersStore = defineStore('dealers', () => {
   const error = ref<string | null>(null)
   const activeFilter = ref<StatusFilter>('all')
   const currentPage = ref(1)
-  const pageSize = 10
+  const pageSize = ref(10)
 
   const enriched = computed(() =>
     dealers.value.map((d) => ({ ...d, _status: normalizeStatus(d.status) })),
@@ -46,11 +46,13 @@ export const useDealersStore = defineStore('dealers', () => {
     return enriched.value.filter((d) => d._status === activeFilter.value)
   })
 
-  const totalPages = computed(() => Math.max(1, Math.ceil(filteredDealers.value.length / pageSize)))
+  const totalPages = computed(() =>
+    Math.max(1, Math.ceil(filteredDealers.value.length / pageSize.value)),
+  )
 
   const paginatedDealers = computed(() => {
-    const start = (currentPage.value - 1) * pageSize
-    return filteredDealers.value.slice(start, start + pageSize)
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredDealers.value.slice(start, start + pageSize.value)
   })
 
   const counts = computed(() => ({
@@ -66,8 +68,21 @@ export const useDealersStore = defineStore('dealers', () => {
   }
 
   function setPage(page: number) {
-    currentPage.value = page
+    currentPage.value = Math.min(Math.max(1, page), totalPages.value)
   }
+
+  function setPageSize(size: number) {
+    pageSize.value = Math.max(1, size)
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value
+    }
+  }
+
+  watch(filteredDealers, () => {
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value
+    }
+  })
 
   async function fetchDealers() {
     isLoading.value = true
@@ -94,6 +109,7 @@ export const useDealersStore = defineStore('dealers', () => {
     counts,
     setFilter,
     setPage,
+    setPageSize,
     fetchDealers,
   }
 })

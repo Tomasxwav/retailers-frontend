@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, onBeforeUnmount, computed, nextTick, ref, watch } from 'vue'
 import { useClientsStore, getClientName } from '@/stores/clients'
 import type { StatusFilter } from '@/stores/clients'
 import {
@@ -15,7 +15,48 @@ import {
 
 const store = useClientsStore()
 
-onMounted(() => store.fetchClients())
+const pageRoot = ref<HTMLElement | null>(null)
+const headerSection = ref<HTMLElement | null>(null)
+const cardsSection = ref<HTMLElement | null>(null)
+const tableCardHeight = ref(420)
+
+const BASE_ROW_HEIGHT = 57
+const TABLE_HEAD_AND_FOOT = 104
+const MIN_TABLE_HEIGHT = 260
+
+function updateViewportFit() {
+  if (!pageRoot.value) return
+
+  const rootHeight = pageRoot.value.clientHeight
+  const usedHeight =
+    (headerSection.value?.offsetHeight ?? 0) + (cardsSection.value?.offsetHeight ?? 0) + 20
+  const nextCardHeight = Math.max(MIN_TABLE_HEIGHT, rootHeight - usedHeight)
+
+  tableCardHeight.value = nextCardHeight
+
+  const rowsArea = nextCardHeight - TABLE_HEAD_AND_FOOT
+  const computedRows = Math.max(4, Math.floor(rowsArea / BASE_ROW_HEIGHT))
+  store.setPageSize(computedRows)
+}
+
+onMounted(async () => {
+  await store.fetchClients()
+  await nextTick()
+  updateViewportFit()
+  window.addEventListener('resize', updateViewportFit)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewportFit)
+})
+
+watch(
+  () => [store.activeFilter, store.filteredClients.length],
+  async () => {
+    await nextTick()
+    updateViewportFit()
+  },
+)
 
 const statusCards = computed(() => [
   {
@@ -89,9 +130,12 @@ const pageNumbers = computed(() => {
 </script>
 
 <template>
-  <div class="p-6 lg:p-8">
+  <div
+    ref="pageRoot"
+    class="flex h-full min-h-0 flex-col gap-4 overflow-hidden px-4 py-4 lg:px-6 lg:py-6"
+  >
     <!-- ── Header ── -->
-    <div class="mb-6 flex items-center justify-between animate-fade-in-up">
+    <div ref="headerSection" class="flex items-center justify-between animate-fade-in-up">
       <div>
         <h2 class="text-xl font-bold text-slate-900" style="font-family: 'Syne', sans-serif">
           Solicitudes de Clientes
@@ -110,7 +154,10 @@ const pageNumbers = computed(() => {
     </div>
 
     <!-- ── Status cards ── -->
-    <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-in-up delay-100">
+    <div
+      ref="cardsSection"
+      class="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-in-up delay-100"
+    >
       <button
         v-for="card in statusCards"
         :key="card.key"
@@ -152,10 +199,11 @@ const pageNumbers = computed(() => {
 
     <!-- ── Table card ── -->
     <div
-      class="animate-fade-in-up delay-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      class="animate-fade-in-up delay-200 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      :style="{ height: `${tableCardHeight}px` }"
     >
       <!-- Loading state -->
-      <div v-if="store.isLoading" class="p-6">
+      <div v-if="store.isLoading" class="flex-1 p-6">
         <div class="space-y-3">
           <div v-for="i in 6" :key="i" class="flex gap-4">
             <div class="skeleton h-4 w-48" />
@@ -170,7 +218,7 @@ const pageNumbers = computed(() => {
       <!-- Error state -->
       <div
         v-else-if="store.error"
-        class="flex flex-col items-center justify-center gap-3 p-16 text-center"
+        class="flex flex-1 flex-col items-center justify-center gap-3 p-16 text-center"
       >
         <ExclamationTriangleIcon class="h-10 w-10 text-red-400" />
         <p class="font-medium text-slate-700">{{ store.error }}</p>
@@ -185,7 +233,7 @@ const pageNumbers = computed(() => {
       <!-- Empty state -->
       <div
         v-else-if="store.filteredClients.length === 0"
-        class="flex flex-col items-center justify-center gap-3 p-16 text-center"
+        class="flex flex-1 flex-col items-center justify-center gap-3 p-16 text-center"
       >
         <UsersIcon class="h-10 w-10 text-slate-300" />
         <p class="font-medium text-slate-500">No hay clientes con este estado</p>
@@ -198,7 +246,7 @@ const pageNumbers = computed(() => {
       </div>
 
       <!-- Table -->
-      <div v-else class="overflow-x-auto table-scroll">
+      <div v-else class="table-scroll min-h-0 flex-1 overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom: 1px solid #f1f5f9; background: #f8fafc">
@@ -294,56 +342,56 @@ const pageNumbers = computed(() => {
             </tr>
           </tbody>
         </table>
+      </div>
 
-        <!-- ── Pagination ── -->
-        <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
-          <p class="text-xs text-slate-400">
-            Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{
-              Math.min(store.currentPage * store.pageSize, store.filteredClients.length)
-            }}
-            de {{ store.filteredClients.length }}
-          </p>
-          <div class="flex items-center gap-1">
-            <!-- Prev -->
-            <button
-              :disabled="store.currentPage === 1"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
-              @click="store.setPage(store.currentPage - 1)"
+      <!-- ── Pagination ── -->
+      <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
+        <p class="text-xs text-slate-400">
+          Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{
+            Math.min(store.currentPage * store.pageSize, store.filteredClients.length)
+          }}
+          de {{ store.filteredClients.length }}
+        </p>
+        <div class="flex items-center gap-1">
+          <!-- Prev -->
+          <button
+            :disabled="store.currentPage === 1"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            @click="store.setPage(store.currentPage - 1)"
+          >
+            <ChevronLeftIcon class="h-4 w-4" />
+          </button>
+
+          <!-- Page numbers -->
+          <template v-for="(p, i) in pageNumbers" :key="i">
+            <span
+              v-if="p === '…'"
+              class="flex h-8 w-8 items-center justify-center text-xs text-slate-400"
             >
-              <ChevronLeftIcon class="h-4 w-4" />
-            </button>
-
-            <!-- Page numbers -->
-            <template v-for="(p, i) in pageNumbers" :key="i">
-              <span
-                v-if="p === '…'"
-                class="flex h-8 w-8 items-center justify-center text-xs text-slate-400"
-              >
-                …
-              </span>
-              <button
-                v-else
-                class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all"
-                :class="
-                  p === store.currentPage
-                    ? 'border-red-600 bg-red-600 text-white'
-                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                "
-                @click="store.setPage(Number(p))"
-              >
-                {{ p }}
-              </button>
-            </template>
-
-            <!-- Next -->
+              …
+            </span>
             <button
-              :disabled="store.currentPage === store.totalPages"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
-              @click="store.setPage(store.currentPage + 1)"
+              v-else
+              class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all"
+              :class="
+                p === store.currentPage
+                  ? 'border-red-600 bg-red-600 text-white'
+                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+              "
+              @click="store.setPage(Number(p))"
             >
-              <ChevronRightIcon class="h-4 w-4" />
+              {{ p }}
             </button>
-          </div>
+          </template>
+
+          <!-- Next -->
+          <button
+            :disabled="store.currentPage === store.totalPages"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            @click="store.setPage(store.currentPage + 1)"
+          >
+            <ChevronRightIcon class="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

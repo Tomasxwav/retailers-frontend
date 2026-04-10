@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { apiFetch } from '@/services/api'
 
@@ -46,7 +46,7 @@ export const useClientsStore = defineStore('clients', () => {
   const error = ref<string | null>(null)
   const activeFilter = ref<StatusFilter>('all')
   const currentPage = ref(1)
-  const pageSize = 10
+  const pageSize = ref(10)
 
   const enriched = computed(() =>
     clients.value.map((c) => ({ ...c, _status: normalizeStatus(c.status) })),
@@ -57,11 +57,13 @@ export const useClientsStore = defineStore('clients', () => {
     return enriched.value.filter((c) => c._status === activeFilter.value)
   })
 
-  const totalPages = computed(() => Math.max(1, Math.ceil(filteredClients.value.length / pageSize)))
+  const totalPages = computed(() =>
+    Math.max(1, Math.ceil(filteredClients.value.length / pageSize.value)),
+  )
 
   const paginatedClients = computed(() => {
-    const start = (currentPage.value - 1) * pageSize
-    return filteredClients.value.slice(start, start + pageSize)
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredClients.value.slice(start, start + pageSize.value)
   })
 
   const counts = computed(() => ({
@@ -77,8 +79,21 @@ export const useClientsStore = defineStore('clients', () => {
   }
 
   function setPage(page: number) {
-    currentPage.value = page
+    currentPage.value = Math.min(Math.max(1, page), totalPages.value)
   }
+
+  function setPageSize(size: number) {
+    pageSize.value = Math.max(1, size)
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value
+    }
+  }
+
+  watch(filteredClients, () => {
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value
+    }
+  })
 
   async function fetchClients() {
     isLoading.value = true
@@ -105,6 +120,7 @@ export const useClientsStore = defineStore('clients', () => {
     counts,
     setFilter,
     setPage,
+    setPageSize,
     fetchClients,
   }
 })
