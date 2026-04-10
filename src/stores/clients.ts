@@ -18,6 +18,11 @@ export interface Client {
   [key: string]: unknown
 }
 
+export interface ClientsRequest {
+  requests: Client[]
+  status_summary: { status: 'approved' | 'pending' | 'rejected'; total: number }[]
+}
+
 export type StatusFilter = 'all' | 'approved' | 'pending' | 'rejected'
 
 export function normalizeStatus(status?: string): 'approved' | 'pending' | 'rejected' {
@@ -79,8 +84,8 @@ export const useClientsStore = defineStore('clients', () => {
     isLoading.value = true
     error.value = null
     try {
-      const data = await apiFetch<Client[] | { data: Client[] }>('/clients/requests')
-      clients.value = Array.isArray(data) ? data : (data.data ?? [])
+      const data = await apiFetch<ClientsRequest>('/clients/requests')
+      clients.value = data.requests ?? []
     } catch {
       error.value = 'No se pudieron cargar los clientes'
     } finally {
