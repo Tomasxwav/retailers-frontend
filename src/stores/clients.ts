@@ -11,7 +11,7 @@ export interface Client {
   email?: string
   phone?: string
   status?: string
-  createdAt?: string
+  created_at?: string
   requestDate?: string
   updatedAt?: string
   vin?: string

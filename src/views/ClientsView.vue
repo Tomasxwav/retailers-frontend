@@ -161,7 +161,7 @@ const pageNumbers = computed(() => {
       <button
         v-for="card in statusCards"
         :key="card.key"
-        class="group relative flex flex-col gap-2 rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
+        class="group cursor-pointer relative flex flex-col gap-2 rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
         :class="store.activeFilter === card.key ? card.activeStyle : card.inactiveStyle"
         @click="store.setFilter(card.key)"
       >
@@ -251,32 +251,32 @@ const pageNumbers = computed(() => {
           <thead>
             <tr style="border-bottom: 1px solid #f1f5f9; background: #f8fafc">
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Nombre
               </th>
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Email
               </th>
-              <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              <!--              <th
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Teléfono
-              </th>
+              </th> -->
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 VIN
               </th>
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Estado
               </th>
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Fecha
               </th>
@@ -289,7 +289,7 @@ const pageNumbers = computed(() => {
               class="border-b border-slate-50 transition-colors duration-100 hover:bg-slate-50/80"
             >
               <!-- Name -->
-              <td class="px-5 py-4">
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5">
                 <div class="flex items-center gap-2.5">
                   <div
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
@@ -301,15 +301,15 @@ const pageNumbers = computed(() => {
                 </div>
               </td>
               <!-- Email -->
-              <td class="px-5 py-4 text-slate-600">
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
                 {{ client.email ?? '—' }}
               </td>
               <!-- Phone -->
-              <td class="px-5 py-4 text-slate-600">
+              <!-- <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
                 {{ client.phone ?? '—' }}
-              </td>
+              </td> -->
               <!-- VIN -->
-              <td class="px-5 py-4">
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5">
                 <span
                   v-if="client.vin"
                   class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600"
@@ -319,7 +319,7 @@ const pageNumbers = computed(() => {
                 <span v-else class="text-slate-400">—</span>
               </td>
               <!-- Status badge -->
-              <td class="px-5 py-4">
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5">
                 <span
                   class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
                   :class="statusBadge[client._status as string] ?? 'bg-slate-100 text-slate-600'"
@@ -336,8 +336,8 @@ const pageNumbers = computed(() => {
                 </span>
               </td>
               <!-- Date -->
-              <td class="px-5 py-4 text-slate-500">
-                {{ formatDate(String(client.createdAt ?? client.requestDate ?? '')) }}
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-500">
+                {{ formatDate(String(client.created_at ?? client.requestDate ?? '')) }}
               </td>
             </tr>
           </tbody>

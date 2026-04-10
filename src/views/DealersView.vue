@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, computed, nextTick, ref, watch } from 'vue'
-import { useDealersStore, getDealerName } from '@/stores/dealers'
-import type { StatusFilter } from '@/stores/clients'
+import { useDealersStore, getDealerConcessionaire } from '@/stores/dealers'
 import {
   BuildingStorefrontIcon,
-  FunnelIcon,
+  MagnifyingGlassIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ExclamationTriangleIcon,
@@ -15,7 +14,7 @@ const store = useDealersStore()
 
 const pageRoot = ref<HTMLElement | null>(null)
 const headerSection = ref<HTMLElement | null>(null)
-const cardsSection = ref<HTMLElement | null>(null)
+const filtersSection = ref<HTMLElement | null>(null)
 const tableCardHeight = ref(420)
 
 const BASE_ROW_HEIGHT = 57
@@ -27,7 +26,7 @@ function updateViewportFit() {
 
   const rootHeight = pageRoot.value.clientHeight
   const usedHeight =
-    (headerSection.value?.offsetHeight ?? 0) + (cardsSection.value?.offsetHeight ?? 0) + 20
+    (headerSection.value?.offsetHeight ?? 0) + (filtersSection.value?.offsetHeight ?? 0) + 20
   const nextCardHeight = Math.max(MIN_TABLE_HEIGHT, rootHeight - usedHeight)
 
   tableCardHeight.value = nextCardHeight
@@ -49,65 +48,36 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => [store.activeFilter, store.filteredDealers.length],
+  () => [store.selectedState, store.selectedCity, store.searchQuery, store.filteredDealers.length],
   async () => {
     await nextTick()
     updateViewportFit()
   },
 )
 
-const statusCards = computed(() => [
-  {
-    key: 'all' as StatusFilter,
-    label: 'Todos',
-    count: store.counts.all,
-    activeStyle: 'border-slate-800 bg-slate-800 text-white',
-    inactiveStyle: 'border-slate-200 bg-white text-slate-700 hover:border-slate-300',
-    dot: '',
-  },
-  {
-    key: 'approved' as StatusFilter,
-    label: 'Aprobados',
-    count: store.counts.approved,
-    activeStyle: 'border-emerald-600 bg-emerald-600 text-white',
-    inactiveStyle: 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300',
-    dot: 'bg-emerald-500',
-  },
-  {
-    key: 'pending' as StatusFilter,
-    label: 'Pendientes',
-    count: store.counts.pending,
-    activeStyle: 'border-amber-500 bg-amber-500 text-white',
-    inactiveStyle: 'border-slate-200 bg-white text-slate-700 hover:border-amber-300',
-    dot: 'bg-amber-400',
-  },
-  {
-    key: 'rejected' as StatusFilter,
-    label: 'Rechazados',
-    count: store.counts.rejected,
-    activeStyle: 'border-red-600 bg-red-600 text-white',
-    inactiveStyle: 'border-slate-200 bg-white text-slate-700 hover:border-red-300',
-    dot: 'bg-red-500',
-  },
-])
-
-const statusBadge: Record<string, string> = {
-  approved: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  pending: 'bg-amber-50 text-amber-700 border border-amber-200',
-  rejected: 'bg-red-50 text-red-700 border border-red-200',
-}
-
-const statusLabel: Record<string, string> = {
-  approved: 'Aprobado',
-  pending: 'Pendiente',
-  rejected: 'Rechazado',
-}
-
 function formatDate(val?: string): string {
   if (!val) return '—'
   const d = new Date(val)
   if (isNaN(d.getTime())) return val
   return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function onStateChange(event: Event) {
+  store.setStateFilter((event.target as HTMLSelectElement).value)
+}
+
+function onCityChange(event: Event) {
+  store.setCityFilter((event.target as HTMLSelectElement).value)
+}
+
+function onSearchInput(event: Event) {
+  store.setSearch((event.target as HTMLInputElement).value)
+}
+
+function clearFilters() {
+  store.setStateFilter('all')
+  store.setCityFilter('all')
+  store.setSearch('')
 }
 
 const pageNumbers = computed(() => {
@@ -138,54 +108,55 @@ const pageNumbers = computed(() => {
           {{ store.counts.all }} distribuidores registrados
         </p>
       </div>
-      <div class="flex items-center gap-2 text-xs text-slate-400">
-        <FunnelIcon class="h-4 w-4" />
-        <span
-          >Filtrado por:
-          <strong class="text-slate-600">{{
-            statusLabel[store.activeFilter] ?? 'Todos'
-          }}</strong></span
-        >
+      <div class="text-xs text-slate-400">
+        Mostrando <strong class="text-slate-600">{{ store.counts.filtered }}</strong> resultados
       </div>
     </div>
 
-    <!-- ── Status cards ── -->
+    <!-- ── Filters ── -->
     <div
-      ref="cardsSection"
-      class="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-in-up delay-100"
+      ref="filtersSection"
+      class="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-3 animate-fade-in-up delay-100 md:grid-cols-3"
     >
-      <button
-        v-for="card in statusCards"
-        :key="card.key"
-        class="group relative flex flex-col gap-2 rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
-        :class="store.activeFilter === card.key ? card.activeStyle : card.inactiveStyle"
-        @click="store.setFilter(card.key)"
-      >
-        <span
-          class="text-2xl font-bold leading-none tracking-tight"
-          style="font-family: 'Syne', sans-serif"
-          :class="store.activeFilter === card.key ? 'text-inherit' : 'text-slate-900'"
+      <label class="flex flex-col gap-1">
+        <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Estado</span>
+        <select
+          class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
+          :value="store.selectedState"
+          @change="onStateChange"
         >
-          {{ card.count }}
-        </span>
-        <div class="flex items-center gap-1.5">
-          <span
-            v-if="card.dot"
-            class="h-2 w-2 shrink-0 rounded-full"
-            :class="store.activeFilter === card.key ? 'bg-white/60' : card.dot"
+          <option value="all">Todos</option>
+          <option v-for="state in store.states" :key="state" :value="state">{{ state }}</option>
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Ciudad</span>
+        <select
+          class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
+          :value="store.selectedCity"
+          @change="onCityChange"
+        >
+          <option value="all">Todas</option>
+          <option v-for="city in store.cities" :key="city" :value="city">{{ city }}</option>
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Búsqueda</span>
+        <div class="relative">
+          <MagnifyingGlassIcon
+            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
           />
-          <span
-            class="text-sm font-medium leading-none"
-            :class="store.activeFilter === card.key ? 'text-white/90' : 'text-slate-600'"
-          >
-            {{ card.label }}
-          </span>
+          <input
+            type="search"
+            placeholder="Concesionario, ciudad, estado..."
+            class="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-red-300 focus:ring-2 focus:ring-red-100"
+            :value="store.searchQuery"
+            @input="onSearchInput"
+          />
         </div>
-        <span
-          v-if="store.activeFilter === card.key"
-          class="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-white/60"
-        />
-      </button>
+      </label>
     </div>
 
     <!-- ── Table card ── -->
@@ -227,12 +198,12 @@ const pageNumbers = computed(() => {
         class="flex flex-1 flex-col items-center justify-center gap-3 p-16 text-center"
       >
         <BuildingStorefrontIcon class="h-10 w-10 text-slate-300" />
-        <p class="font-medium text-slate-500">No hay dealers con este estado</p>
+        <p class="font-medium text-slate-500">No hay dealers para los filtros seleccionados</p>
         <button
           class="mt-1 text-sm text-red-600 hover:text-red-700 underline underline-offset-2 transition-colors"
-          @click="store.setFilter('all')"
+          @click="clearFilters"
         >
-          Ver todos
+          Limpiar filtros
         </button>
       </div>
 
@@ -242,32 +213,32 @@ const pageNumbers = computed(() => {
           <thead>
             <tr style="border-bottom: 1px solid #f1f5f9; background: #f8fafc">
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
-                Dealer
+                Concesionario
               </th>
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
-              >
-                Email
-              </th>
-              <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
-              >
-                Teléfono
-              </th>
-              <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
-              >
-                Ubicación
-              </th>
-              <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Estado
               </th>
               <th
-                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Ciudad
+              </th>
+              <th
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Dirección
+              </th>
+              <th
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Dealer ID
+              </th>
+              <th
+                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Fecha
               </th>
@@ -276,60 +247,48 @@ const pageNumbers = computed(() => {
           <tbody>
             <tr
               v-for="(dealer, i) in store.paginatedDealers"
-              :key="String(dealer.id ?? dealer._id ?? i)"
+              :key="String(dealer.id ?? dealer.dealer_id ?? i)"
               class="border-b border-slate-50 transition-colors duration-100 hover:bg-slate-50/80"
             >
               <!-- Name -->
-              <td class="px-5 py-4">
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5">
                 <div class="flex items-center gap-2.5">
                   <div
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
                     style="background: linear-gradient(135deg, #dc2626, #b91c1c)"
                   >
-                    {{ getDealerName(dealer).slice(0, 2).toUpperCase() }}
+                    {{ getDealerConcessionaire(dealer).slice(0, 2).toUpperCase() }}
                   </div>
-                  <span class="font-medium text-slate-800">{{ getDealerName(dealer) }}</span>
+                  <span class="font-medium text-slate-800">{{
+                    getDealerConcessionaire(dealer)
+                  }}</span>
                 </div>
               </td>
-              <!-- Email -->
-              <td class="px-5 py-4 text-slate-600">
-                {{ dealer.email ?? '—' }}
+              <!-- State -->
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
+                {{ dealer.state ?? '—' }}
               </td>
-              <!-- Phone -->
-              <td class="px-5 py-4 text-slate-600">
-                {{ dealer.phone ?? '—' }}
+              <!-- City -->
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
+                {{ dealer.city ?? '—' }}
               </td>
-              <!-- Location -->
-              <td class="px-5 py-4">
-                <div
-                  v-if="dealer.address ?? dealer.location ?? dealer.city"
-                  class="flex items-center gap-1 text-slate-600"
-                >
+              <!-- Address -->
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5">
+                <div v-if="dealer.address" class="flex items-center gap-1 text-slate-600">
                   <MapPinIcon class="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                  <span>{{ dealer.city ?? dealer.location ?? dealer.address }}</span>
+                  <span>{{ dealer.address }}</span>
                 </div>
                 <span v-else class="text-slate-400">—</span>
               </td>
-              <!-- Status badge -->
-              <td class="px-5 py-4">
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
-                  :class="statusBadge[dealer._status as string] ?? 'bg-slate-100 text-slate-600'"
-                >
-                  <span
-                    class="h-1.5 w-1.5 rounded-full"
-                    :class="{
-                      'bg-emerald-500': dealer._status === 'approved',
-                      'bg-amber-400': dealer._status === 'pending',
-                      'bg-red-500': dealer._status === 'rejected',
-                    }"
-                  />
-                  {{ statusLabel[dealer._status as string] ?? dealer.status ?? '—' }}
+              <!-- Dealer ID -->
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
+                <span class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600">
+                  {{ dealer.dealer_id ?? dealer.id ?? '—' }}
                 </span>
               </td>
               <!-- Date -->
-              <td class="px-5 py-4 text-slate-500">
-                {{ formatDate(String(dealer.createdAt ?? dealer.updatedAt ?? '')) }}
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-500">
+                {{ formatDate(String(dealer.created_at ?? dealer.updated_at ?? '')) }}
               </td>
             </tr>
           </tbody>
