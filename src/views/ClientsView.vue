@@ -96,13 +96,16 @@ const pageNumbers = computed(() => {
         <h2 class="text-xl font-bold text-slate-900" style="font-family: 'Syne', sans-serif">
           Solicitudes de Clientes
         </h2>
-        <p class="mt-0.5 text-sm text-slate-500">
-          {{ store.counts.all }} registros en total
-        </p>
+        <p class="mt-0.5 text-sm text-slate-500">{{ store.counts.all }} registros en total</p>
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-400">
         <FunnelIcon class="h-4 w-4" />
-        <span>Filtrado por: <strong class="text-slate-600">{{ statusLabel[store.activeFilter] ?? 'Todos' }}</strong></span>
+        <span
+          >Filtrado por:
+          <strong class="text-slate-600">{{
+            statusLabel[store.activeFilter] ?? 'Todos'
+          }}</strong></span
+        >
       </div>
     </div>
 
@@ -128,10 +131,13 @@ const pageNumbers = computed(() => {
         <div class="flex items-center gap-1.5">
           <span
             v-if="card.dot"
-            class="h-2 w-2 flex-shrink-0 rounded-full"
+            class="h-2 w-2 shrink-0 rounded-full"
             :class="store.activeFilter === card.key ? 'bg-white/60' : card.dot"
           />
-          <span class="text-sm font-medium leading-none" :class="store.activeFilter === card.key ? 'text-white/90' : 'text-slate-600'">
+          <span
+            class="text-sm font-medium leading-none"
+            :class="store.activeFilter === card.key ? 'text-white/90' : 'text-slate-600'"
+          >
             {{ card.label }}
           </span>
         </div>
@@ -145,7 +151,9 @@ const pageNumbers = computed(() => {
     </div>
 
     <!-- ── Table card ── -->
-    <div class="animate-fade-in-up delay-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div
+      class="animate-fade-in-up delay-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
       <!-- Loading state -->
       <div v-if="store.isLoading" class="p-6">
         <div class="space-y-3">
@@ -160,7 +168,10 @@ const pageNumbers = computed(() => {
       </div>
 
       <!-- Error state -->
-      <div v-else-if="store.error" class="flex flex-col items-center justify-center gap-3 p-16 text-center">
+      <div
+        v-else-if="store.error"
+        class="flex flex-col items-center justify-center gap-3 p-16 text-center"
+      >
         <ExclamationTriangleIcon class="h-10 w-10 text-red-400" />
         <p class="font-medium text-slate-700">{{ store.error }}</p>
         <button
@@ -191,22 +202,34 @@ const pageNumbers = computed(() => {
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom: 1px solid #f1f5f9; background: #f8fafc">
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Nombre
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Email
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Teléfono
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 VIN
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Estado
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Fecha
               </th>
             </tr>
@@ -221,7 +244,7 @@ const pageNumbers = computed(() => {
               <td class="px-5 py-4">
                 <div class="flex items-center gap-2.5">
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                     style="background: linear-gradient(135deg, #334155, #475569)"
                   >
                     {{ getClientName(client).slice(0, 2).toUpperCase() }}
@@ -239,7 +262,10 @@ const pageNumbers = computed(() => {
               </td>
               <!-- VIN -->
               <td class="px-5 py-4">
-                <span v-if="client.vin" class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600">
+                <span
+                  v-if="client.vin"
+                  class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600"
+                >
                   {{ client.vin }}
                 </span>
                 <span v-else class="text-slate-400">—</span>
@@ -250,7 +276,8 @@ const pageNumbers = computed(() => {
                   class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
                   :class="statusBadge[client._status as string] ?? 'bg-slate-100 text-slate-600'"
                 >
-                  <span class="h-1.5 w-1.5 rounded-full"
+                  <span
+                    class="h-1.5 w-1.5 rounded-full"
                     :class="{
                       'bg-emerald-500': client._status === 'approved',
                       'bg-amber-400': client._status === 'pending',
@@ -271,7 +298,9 @@ const pageNumbers = computed(() => {
         <!-- ── Pagination ── -->
         <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
           <p class="text-xs text-slate-400">
-            Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{ Math.min(store.currentPage * store.pageSize, store.filteredClients.length) }}
+            Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{
+              Math.min(store.currentPage * store.pageSize, store.filteredClients.length)
+            }}
             de {{ store.filteredClients.length }}
           </p>
           <div class="flex items-center gap-1">
@@ -286,7 +315,10 @@ const pageNumbers = computed(() => {
 
             <!-- Page numbers -->
             <template v-for="(p, i) in pageNumbers" :key="i">
-              <span v-if="p === '…'" class="flex h-8 w-8 items-center justify-center text-xs text-slate-400">
+              <span
+                v-if="p === '…'"
+                class="flex h-8 w-8 items-center justify-center text-xs text-slate-400"
+              >
                 …
               </span>
               <button

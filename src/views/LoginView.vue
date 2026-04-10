@@ -45,7 +45,8 @@ async function handleSubmit() {
       <div
         class="absolute inset-0 opacity-5"
         style="
-          background-image: linear-gradient(#ffffff 1px, transparent 1px),
+          background-image:
+            linear-gradient(#ffffff 1px, transparent 1px),
             linear-gradient(90deg, #ffffff 1px, transparent 1px);
           background-size: 48px 48px;
         "
@@ -53,9 +54,7 @@ async function handleSubmit() {
     </div>
 
     <!-- ── Left panel — brand ── -->
-    <div
-      class="relative hidden flex-col justify-between p-12 lg:flex lg:w-1/2"
-    >
+    <div class="relative hidden flex-col justify-between p-12 lg:flex lg:w-1/2">
       <!-- Logo -->
       <div
         class="flex items-center gap-3 animate-fade-in-up"
@@ -68,7 +67,10 @@ async function handleSubmit() {
           M
         </div>
         <div>
-          <span class="text-white font-bold tracking-wider" style="font-family: 'Syne', sans-serif; font-size: 16px">
+          <span
+            class="text-white font-bold tracking-wider"
+            style="font-family: 'Syne', sans-serif; font-size: 16px"
+          >
             MOTOMEX
           </span>
           <span class="ml-2 text-xs" style="color: #475569; letter-spacing: 0.12em">RETAILERS</span>
@@ -80,19 +82,36 @@ async function handleSubmit() {
         <!-- Big tagline -->
         <h2
           class="mb-6 leading-none text-white animate-fade-in-up delay-150"
-          style="font-family: 'Syne', sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 800"
+          style="
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 800;
+          "
         >
           Panel de<br />
           <span style="color: #dc2626">Administración</span>
         </h2>
-        <p class="max-w-sm text-base leading-relaxed animate-fade-in-up delay-250" style="color: #64748b">
-          Gestiona clientes, dealers y solicitudes desde un solo lugar con visibilidad en tiempo real.
+        <p
+          class="max-w-sm text-base leading-relaxed animate-fade-in-up delay-250"
+          style="color: #64748b"
+        >
+          Gestiona clientes, dealers y solicitudes desde un solo lugar con visibilidad en tiempo
+          real.
         </p>
 
         <!-- Stats row -->
         <div class="mt-10 flex gap-8 animate-fade-in-up delay-400">
-          <div v-for="stat in [{ n: 'Clientes', v: '∞' }, { n: 'Dealers', v: '∞' }, { n: 'Solicitudes', v: '∞' }]" :key="stat.n">
-            <p class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif">{{ stat.v }}</p>
+          <div
+            v-for="stat in [
+              { n: 'Clientes', v: '∞' },
+              { n: 'Dealers', v: '∞' },
+              { n: 'Solicitudes', v: '∞' },
+            ]"
+            :key="stat.n"
+          >
+            <p class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif">
+              {{ stat.v }}
+            </p>
             <p class="text-xs mt-1" style="color: #475569">{{ stat.n }}</p>
           </div>
         </div>
@@ -102,7 +121,9 @@ async function handleSubmit() {
       <div class="animate-fade-in delay-500">
         <div class="flex items-center gap-2">
           <div class="h-0.5 w-8 rounded-full" style="background: #dc2626" />
-          <p class="text-xs" style="color: #334155">© 2025 Motomex. Todos los derechos reservados.</p>
+          <p class="text-xs" style="color: #334155">
+            © 2025 Motomex. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </div>
@@ -122,14 +143,20 @@ async function handleSubmit() {
           >
             M
           </div>
-          <span class="font-bold tracking-wider text-slate-800" style="font-family: 'Syne', sans-serif; font-size: 14px">
+          <span
+            class="font-bold tracking-wider text-slate-800"
+            style="font-family: 'Syne', sans-serif; font-size: 14px"
+          >
             MOTOMEX RETAILERS
           </span>
         </div>
 
         <!-- Heading -->
         <div class="mb-8">
-          <h1 class="text-2xl font-bold text-slate-900 leading-tight" style="font-family: 'Syne', sans-serif">
+          <h1
+            class="text-2xl font-bold text-slate-900 leading-tight"
+            style="font-family: 'Syne', sans-serif"
+          >
             Iniciar sesión
           </h1>
           <p class="mt-1.5 text-sm text-slate-500">Ingresa tus credenciales para continuar</p>
@@ -141,7 +168,7 @@ async function handleSubmit() {
             v-if="auth.error"
             class="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5"
           >
-            <div class="mt-0.5 h-4 w-4 flex-shrink-0 rounded-full bg-red-500" />
+            <div class="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-red-500" />
             <p class="text-sm text-red-700">{{ auth.error }}</p>
           </div>
         </Transition>
@@ -197,13 +224,21 @@ async function handleSubmit() {
             class="relative mt-2 w-full overflow-hidden rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60"
             style="background: linear-gradient(135deg, #dc2626, #b91c1c)"
           >
-            <span
-              v-if="auth.isLoading"
-              class="flex items-center justify-center gap-2"
-            >
+            <span v-if="auth.isLoading" class="flex items-center justify-center gap-2">
               <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
               </svg>
               Verificando…
             </span>

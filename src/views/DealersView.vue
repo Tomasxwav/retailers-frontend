@@ -4,9 +4,6 @@ import { useDealersStore, getDealerName } from '@/stores/dealers'
 import type { StatusFilter } from '@/stores/clients'
 import {
   BuildingStorefrontIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  XCircleIcon,
   FunnelIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -99,7 +96,12 @@ const pageNumbers = computed(() => {
       </div>
       <div class="flex items-center gap-2 text-xs text-slate-400">
         <FunnelIcon class="h-4 w-4" />
-        <span>Filtrado por: <strong class="text-slate-600">{{ statusLabel[store.activeFilter] ?? 'Todos' }}</strong></span>
+        <span
+          >Filtrado por:
+          <strong class="text-slate-600">{{
+            statusLabel[store.activeFilter] ?? 'Todos'
+          }}</strong></span
+        >
       </div>
     </div>
 
@@ -122,7 +124,7 @@ const pageNumbers = computed(() => {
         <div class="flex items-center gap-1.5">
           <span
             v-if="card.dot"
-            class="h-2 w-2 flex-shrink-0 rounded-full"
+            class="h-2 w-2 shrink-0 rounded-full"
             :class="store.activeFilter === card.key ? 'bg-white/60' : card.dot"
           />
           <span
@@ -140,7 +142,9 @@ const pageNumbers = computed(() => {
     </div>
 
     <!-- ── Table card ── -->
-    <div class="animate-fade-in-up delay-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div
+      class="animate-fade-in-up delay-200 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
       <!-- Loading -->
       <div v-if="store.isLoading" class="p-6">
         <div class="space-y-3">
@@ -155,7 +159,10 @@ const pageNumbers = computed(() => {
       </div>
 
       <!-- Error -->
-      <div v-else-if="store.error" class="flex flex-col items-center justify-center gap-3 p-16 text-center">
+      <div
+        v-else-if="store.error"
+        class="flex flex-col items-center justify-center gap-3 p-16 text-center"
+      >
         <ExclamationTriangleIcon class="h-10 w-10 text-red-400" />
         <p class="font-medium text-slate-700">{{ store.error }}</p>
         <button
@@ -186,22 +193,34 @@ const pageNumbers = computed(() => {
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom: 1px solid #f1f5f9; background: #f8fafc">
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Dealer
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Email
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Teléfono
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Ubicación
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Estado
               </th>
-              <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th
+                class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
                 Fecha
               </th>
             </tr>
@@ -216,7 +235,7 @@ const pageNumbers = computed(() => {
               <td class="px-5 py-4">
                 <div class="flex items-center gap-2.5">
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white"
                     style="background: linear-gradient(135deg, #dc2626, #b91c1c)"
                   >
                     {{ getDealerName(dealer).slice(0, 2).toUpperCase() }}
@@ -234,8 +253,11 @@ const pageNumbers = computed(() => {
               </td>
               <!-- Location -->
               <td class="px-5 py-4">
-                <div v-if="dealer.address ?? dealer.location ?? dealer.city" class="flex items-center gap-1 text-slate-600">
-                  <MapPinIcon class="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+                <div
+                  v-if="dealer.address ?? dealer.location ?? dealer.city"
+                  class="flex items-center gap-1 text-slate-600"
+                >
+                  <MapPinIcon class="h-3.5 w-3.5 shrink-0 text-slate-400" />
                   <span>{{ dealer.city ?? dealer.location ?? dealer.address }}</span>
                 </div>
                 <span v-else class="text-slate-400">—</span>
@@ -268,7 +290,9 @@ const pageNumbers = computed(() => {
         <!-- ── Pagination ── -->
         <div class="flex items-center justify-between border-t border-slate-100 px-5 py-3.5">
           <p class="text-xs text-slate-400">
-            Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{ Math.min(store.currentPage * store.pageSize, store.filteredDealers.length) }}
+            Mostrando {{ (store.currentPage - 1) * store.pageSize + 1 }}–{{
+              Math.min(store.currentPage * store.pageSize, store.filteredDealers.length)
+            }}
             de {{ store.filteredDealers.length }}
           </p>
           <div class="flex items-center gap-1">
@@ -281,7 +305,11 @@ const pageNumbers = computed(() => {
             </button>
 
             <template v-for="(p, i) in pageNumbers" :key="i">
-              <span v-if="p === '…'" class="flex h-8 w-8 items-center justify-center text-xs text-slate-400">…</span>
+              <span
+                v-if="p === '…'"
+                class="flex h-8 w-8 items-center justify-center text-xs text-slate-400"
+                >…</span
+              >
               <button
                 v-else
                 class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all"

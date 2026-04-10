@@ -21,7 +21,7 @@ function getTitle() {
 <template>
   <div class="flex h-screen overflow-hidden bg-slate-50">
     <!-- ── Sidebar – desktop ── -->
-    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col" style="background: #0b1120">
+    <aside class="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col" style="background: #0b1120">
       <AppSidebar />
     </aside>
 
@@ -56,7 +56,9 @@ function getTitle() {
     <!-- ── Main content ── -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <!-- Top bar (mobile + page title) -->
-      <header class="flex h-14 flex-shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-4 lg:px-6">
+      <header
+        class="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-4 lg:px-6"
+      >
         <!-- Mobile hamburger -->
         <button
           class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors lg:hidden"
@@ -112,7 +114,9 @@ function getTitle() {
 
 /* Page transition */
 .page-enter-active {
-  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .page-leave-active {
   transition: opacity 0.15s ease;
