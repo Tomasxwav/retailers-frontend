@@ -196,7 +196,7 @@ const sections: SectionDefinition[] = [
     <Transition name="modal-fade">
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
         <button
-          class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+          class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm cursor-pointer"
           aria-label="Cerrar modal"
           @click="emit('close')"
         />
