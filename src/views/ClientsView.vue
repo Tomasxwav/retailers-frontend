@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, computed, nextTick, ref, watch } from 'vue'
-import { useClientsStore, getClientName } from '@/stores/clients'
-import type { StatusFilter } from '@/stores/clients'
+import {
+  useClientsStore,
+  getClientName,
+  getClientVin,
+  type StatusFilter,
+  type Client,
+  type ClientCardPayload,
+  type ClientUpdatePayload,
+} from '@/stores/clients'
+import ClientInfoModal from '@/components/ClientInfoModal.vue'
 import {
   UsersIcon,
   CheckCircleIcon,
@@ -11,6 +19,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ExclamationTriangleIcon,
+  PlusIcon,
 } from '@heroicons/vue/24/outline'
 
 const store = useClientsStore()
@@ -23,6 +32,11 @@ const tableCardHeight = ref(420)
 const BASE_ROW_HEIGHT = 57
 const TABLE_HEAD_AND_FOOT = 104
 const MIN_TABLE_HEIGHT = 260
+const modalAction = ref<'update' | 'approve' | null>(null)
+const modalError = ref<string | null>(null)
+const selectedClient = ref<Client | null>(null)
+const selectedClientVin = ref('')
+const isClientModalOpen = ref(false)
 
 function updateViewportFit() {
   if (!pageRoot.value) return
@@ -57,6 +71,54 @@ watch(
     updateViewportFit()
   },
 )
+
+function openClientModal(client: Client) {
+  selectedClient.value = { ...client }
+  selectedClientVin.value = getClientVin(client)
+  modalError.value = null
+  isClientModalOpen.value = true
+}
+
+function closeClientModal() {
+  if (modalAction.value !== null) return
+  isClientModalOpen.value = false
+  selectedClient.value = null
+  selectedClientVin.value = ''
+  modalError.value = null
+}
+
+async function handleClientUpdate(payload: { vin: string; data: ClientUpdatePayload }) {
+  modalAction.value = 'update'
+  modalError.value = null
+  try {
+    await store.updateClient(payload.vin, payload.data)
+    await store.fetchClients()
+    closeClientModal()
+  } catch (error) {
+    modalError.value = error instanceof Error ? error.message : 'No se pudo actualizar el cliente'
+  } finally {
+    modalAction.value = null
+  }
+}
+
+async function handleClientApprove(payload: {
+  vin: string
+  data: ClientUpdatePayload
+  card: ClientCardPayload
+}) {
+  modalAction.value = 'approve'
+  modalError.value = null
+  try {
+    await store.approveClientAndSaveCard(payload.vin, payload.data, payload.card)
+    await store.fetchClients()
+    closeClientModal()
+  } catch (error) {
+    modalError.value =
+      error instanceof Error ? error.message : 'No se pudo aprobar y guardar la tarjeta'
+  } finally {
+    modalAction.value = null
+  }
+}
 
 const statusCards = computed(() => [
   {
@@ -276,6 +338,11 @@ const pageNumbers = computed(() => {
                 Estado
               </th>
               <th
+                class="p-2 xl:px-5 xl:py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Info
+              </th>
+              <th
                 class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
                 Fecha
@@ -334,6 +401,16 @@ const pageNumbers = computed(() => {
                   />
                   {{ statusLabel[client._status as string] ?? client.status ?? '—' }}
                 </span>
+              </td>
+              <!-- Info -->
+              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-center">
+                <button
+                  class="inline-flex cursor-pointer h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+                  title="Ver detalles"
+                  @click="openClientModal(client)"
+                >
+                  <PlusIcon class="h-4 w-4" />
+                </button>
               </td>
               <!-- Date -->
               <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-500">
@@ -395,5 +472,16 @@ const pageNumbers = computed(() => {
         </div>
       </div>
     </div>
+
+    <ClientInfoModal
+      :model-value="isClientModalOpen"
+      :client="selectedClient"
+      :client-vin="selectedClientVin"
+      :loading-action="modalAction"
+      :error="modalError"
+      @close="closeClientModal"
+      @update="handleClientUpdate"
+      @approve="handleClientApprove"
+    />
   </div>
 </template>

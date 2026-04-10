@@ -6,15 +6,23 @@ export interface Client {
   id?: string
   _id?: string
   name?: string
+  nombre?: string
   firstName?: string
   lastName?: string
   email?: string
+  correo?: string
   phone?: string
+  phone_number?: string
+  telefono?: string
   status?: string
+  state?: string
+  city?: string
+  address?: string
   created_at?: string
   requestDate?: string
   updatedAt?: string
   vin?: string
+  vcNIV?: string
   [key: string]: unknown
 }
 
@@ -36,8 +44,41 @@ export function normalizeStatus(status?: string): 'approved' | 'pending' | 'reje
 
 export function getClientName(c: Client): string {
   if (c.name) return c.name
+  if (c.nombre) return c.nombre
   if (c.firstName) return `${c.firstName} ${c.lastName ?? ''}`.trim()
-  return c.email ?? c.vin ?? String(c.id ?? c._id ?? '—')
+  return c.email ?? c.correo ?? c.vin ?? c.vcNIV ?? String(c.id ?? c._id ?? '—')
+}
+
+export function getClientVin(c: Client): string {
+  return c.vin ?? c.vcNIV ?? ''
+}
+
+export interface ClientUpdatePayload {
+  vin: string
+  invoice: string
+  full_name: string
+  email: string
+  phone_number: string
+  birthday: string
+  street: string
+  exterior_number: string
+  interior_number: string
+  neighborhood: string
+  city: string
+  state: string
+  zip: string
+  status: string
+  year: string
+  model: string
+  retailer: string
+}
+
+export interface ClientCardPayload {
+  vcNIV: string
+  phone_number: string
+  telefono: string
+  nombre: string
+  correo: string
 }
 
 export const useClientsStore = defineStore('clients', () => {
@@ -108,6 +149,33 @@ export const useClientsStore = defineStore('clients', () => {
     }
   }
 
+  async function updateClient(vin: string, payload: ClientUpdatePayload) {
+    return apiFetch<Client>(`/clients/${vin}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  async function approveClientAndSaveCard(
+    vin: string,
+    payload: ClientUpdatePayload,
+    cardPayload: ClientCardPayload,
+  ) {
+    const approvedPayload = {
+      ...payload,
+    }
+
+    await apiFetch<Client>(`/clients/${vin}`, {
+      method: 'PUT',
+      body: JSON.stringify(approvedPayload),
+    })
+
+    return apiFetch(`/card`, {
+      method: 'POST',
+      body: JSON.stringify(cardPayload),
+    })
+  }
+
   return {
     isLoading,
     error,
@@ -122,5 +190,7 @@ export const useClientsStore = defineStore('clients', () => {
     setPage,
     setPageSize,
     fetchClients,
+    updateClient,
+    approveClientAndSaveCard,
   }
 })
