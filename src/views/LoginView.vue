@@ -208,7 +208,7 @@ async function handleSubmit() {
               />
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                class="absolute right-3 cursor-pointer top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 @click="showPassword = !showPassword"
               >
                 <EyeSlashIcon v-if="showPassword" class="h-5 w-5" />

@@ -121,7 +121,7 @@ const pageNumbers = computed(() => {
       <label class="flex flex-col gap-1">
         <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Estado</span>
         <select
-          class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
+          class="h-10 rounded-xl border cursor-pointer border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
           :value="store.selectedState"
           @change="onStateChange"
         >
@@ -133,7 +133,7 @@ const pageNumbers = computed(() => {
       <label class="flex flex-col gap-1">
         <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Ciudad</span>
         <select
-          class="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
+          class="h-10 rounded-xl border border-slate-200 cursor-pointer bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-red-300 focus:ring-2 focus:ring-red-100"
           :value="store.selectedCity"
           @change="onCityChange"
         >
@@ -295,7 +295,7 @@ const pageNumbers = computed(() => {
         <div class="flex items-center gap-1">
           <button
             :disabled="store.currentPage === 1"
-            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
             @click="store.setPage(store.currentPage - 1)"
           >
             <ChevronLeftIcon class="h-4 w-4" />
@@ -309,7 +309,7 @@ const pageNumbers = computed(() => {
             >
             <button
               v-else
-              class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all"
+              class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all cursor-pointer"
               :class="
                 p === store.currentPage
                   ? 'border-red-600 bg-red-600 text-white'
@@ -323,7 +323,7 @@ const pageNumbers = computed(() => {
 
           <button
             :disabled="store.currentPage === store.totalPages"
-            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            class="flex h-8 w-8 items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
             @click="store.setPage(store.currentPage + 1)"
           >
             <ChevronRightIcon class="h-4 w-4" />

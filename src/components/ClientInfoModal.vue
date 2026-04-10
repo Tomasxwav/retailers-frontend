@@ -10,6 +10,8 @@ type FieldDefinition = {
   label: string
   span?: 1 | 2
   disabled?: boolean
+  type?: 'text' | 'select'
+  options?: Array<{ label: string; value: string }>
 }
 
 type SectionDefinition = {
@@ -149,7 +151,16 @@ const sections: SectionDefinition[] = [
       { key: 'vin', label: 'VIN', disabled: true },
       { key: 'invoice', label: 'Factura' },
       { key: 'full_name', label: 'Nombre completo', span: 2 },
-      { key: 'status', label: 'Estado' },
+      {
+        key: 'status',
+        label: 'Estado',
+        type: 'select',
+        options: [
+          { label: 'Aprobado', value: 'approved' },
+          { label: 'Pendiente', value: 'pending' },
+          { label: 'Rechazado', value: 'rejected' },
+        ],
+      },
     ],
   },
   {
@@ -241,16 +252,33 @@ const sections: SectionDefinition[] = [
                       {{ field.label }}
                     </span>
                     <input
+                      v-if="field.type !== 'select'"
                       v-model="form[field.key]"
                       :disabled="field.disabled === true"
                       :class="[
-                        'h-11 rounded-xl border px-3 text-sm outline-none transition focus:ring-2 focus:ring-red-100',
+                        'h-11 rounded-xl border px-3 text-sm outline-none transition focus:ring-2 focus:ring-red-100 cursor-pointer',
                         field.disabled
                           ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
                           : 'border-slate-200 bg-white text-slate-700 focus:border-red-300',
                       ]"
                       type="text"
                     />
+                    <select
+                      v-else-if="field.type === 'select'"
+                      v-model="form[field.key]"
+                      :disabled="field.disabled === true"
+                      :class="[
+                        'h-11 rounded-xl border px-3 text-sm outline-none transition focus:ring-2 focus:ring-red-100 cursor-pointer',
+                        field.disabled
+                          ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500'
+                          : 'border-slate-200 bg-white text-slate-700 focus:border-red-300',
+                      ]"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option v-for="opt in field.options" :key="opt.value" :value="opt.value">
+                        {{ opt.label }}
+                      </option>
+                    </select>
                   </label>
                 </div>
               </section>

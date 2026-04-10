@@ -433,7 +433,7 @@ const pageNumbers = computed(() => {
           <!-- Prev -->
           <button
             :disabled="store.currentPage === 1"
-            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
             @click="store.setPage(store.currentPage - 1)"
           >
             <ChevronLeftIcon class="h-4 w-4" />
@@ -449,7 +449,7 @@ const pageNumbers = computed(() => {
             </span>
             <button
               v-else
-              class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all"
+              class="flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all cursor-pointer"
               :class="
                 p === store.currentPage
                   ? 'border-red-600 bg-red-600 text-white'
@@ -464,7 +464,7 @@ const pageNumbers = computed(() => {
           <!-- Next -->
           <button
             :disabled="store.currentPage === store.totalPages"
-            class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
             @click="store.setPage(store.currentPage + 1)"
           >
             <ChevronRightIcon class="h-4 w-4" />
