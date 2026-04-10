@@ -235,11 +235,6 @@ const pageNumbers = computed(() => {
               <th
                 class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
               >
-                Dealer ID
-              </th>
-              <th
-                class="p-2 xl:px-5 xl:py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
-              >
                 Fecha
               </th>
             </tr>
@@ -279,12 +274,6 @@ const pageNumbers = computed(() => {
                   <span>{{ dealer.address }}</span>
                 </div>
                 <span v-else class="text-slate-400">—</span>
-              </td>
-              <!-- Dealer ID -->
-              <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-600">
-                <span class="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600">
-                  {{ dealer.dealer_id ?? dealer.id ?? '—' }}
-                </span>
               </td>
               <!-- Date -->
               <td class="px-2 py-2 xl:px-5 xl:py-3.5 text-slate-500">
