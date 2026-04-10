@@ -221,7 +221,7 @@ async function handleSubmit() {
           <button
             type="submit"
             :disabled="auth.isLoading"
-            class="relative mt-2 w-full overflow-hidden rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60"
+            class="relative mt-2 cursor-pointer w-full overflow-hidden rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-60"
             style="background: linear-gradient(135deg, #dc2626, #b91c1c)"
           >
             <span v-if="auth.isLoading" class="flex items-center justify-center gap-2">
