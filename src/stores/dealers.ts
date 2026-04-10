@@ -73,8 +73,8 @@ export const useDealersStore = defineStore('dealers', () => {
     isLoading.value = true
     error.value = null
     try {
-      const data = await apiFetch<Dealer[] | { data: Dealer[] }>('/dealers')
-      dealers.value = Array.isArray(data) ? data : (data.data ?? [])
+      const data = await apiFetch<{ dealers: Dealer[] }>('/dealers')
+      dealers.value = data.dealers ?? []
     } catch {
       error.value = 'No se pudieron cargar los dealers'
     } finally {
