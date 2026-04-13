@@ -30,6 +30,11 @@ const router = createRouter({
           name: 'dealers',
           component: () => import('../views/DealersView.vue'),
         },
+        {
+          path: 'modelos',
+          name: 'models',
+          component: () => import('../views/ModelsView.vue'),
+        },
       ],
     },
     {

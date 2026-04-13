@@ -6,6 +6,7 @@ import {
   Squares2X2Icon,
   UsersIcon,
   BuildingStorefrontIcon,
+  CubeIcon,
   ArrowRightStartOnRectangleIcon,
 } from '@heroicons/vue/24/outline'
 
@@ -17,6 +18,7 @@ const navItems = [
   { name: 'Dashboard', icon: Squares2X2Icon, to: '/', routeName: 'dashboard' },
   { name: 'Clientes', icon: UsersIcon, to: '/clientes', routeName: 'clients' },
   { name: 'Dealers', icon: BuildingStorefrontIcon, to: '/dealers', routeName: 'dealers' },
+  { name: 'Modelos', icon: CubeIcon, to: '/modelos', routeName: 'models' },
 ]
 
 function isActive(item: (typeof navItems)[number]) {

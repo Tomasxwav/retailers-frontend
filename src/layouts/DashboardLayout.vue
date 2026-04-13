@@ -11,6 +11,7 @@ const pageTitles: Record<string, string> = {
   dashboard: 'Dashboard',
   clients: 'Clientes',
   dealers: 'Dealers',
+  models: 'Modelos',
 }
 
 function getTitle() {
